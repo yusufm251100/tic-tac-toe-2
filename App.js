@@ -1,6 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { StyleSheet, Text, View, Pressable, SafeAreaView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  SafeAreaView,
+  Alert,
+  TextInput,
+} from 'react-native';
 
 export default function App() {
   const [boxValues, setBoxValues] = useState([
@@ -14,44 +22,60 @@ export default function App() {
     '',
     '',
   ]);
-  const [boxHiddenValues, setBoxHiddenValues] = useState([
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-  ]);
+
   const [currentPlayer, setCurrentPlayer] = useState('X');
-  const [currentHiddenPlayer, setCurrentHiddenPlayer] = useState(-1);
+  const [player1Name, setPlayer1Name] = useState('Player 1');
+  const [player2Name, setPlayer2Name] = useState('Player 2');
+  const [player1Score, setPlayer1Score] = useState(0);
+  const [player2Score, setPlayer2Score] = useState(0);
 
   function handlePress(index) {
     if (boxValues[index] !== '') return;
-    if (boxHiddenValues[index] !== '') return;
-
     let newValues = boxValues.slice();
-    let newHiddenValues = boxHiddenValues.slice();
-
     newValues[index] = currentPlayer;
-    newHiddenValues[index] = currentHiddenPlayer;
-
     setBoxValues(newValues);
-    setHiddenBoxValues(newHiddenValues);
-    setCurrentHiddenPlayer(currentHiddenPlayer == -1 ? 1 : -1);
+    if (checkWin(newValues)) {
+      if (currentPlayer === 'X') {
+        setPlayer1Score(player1Score + 1);
+      } else {
+        setPlayer2Score(player2Score + 1);
+      }
+
+      Alert.alert(
+        `${
+          currentPlayer === 'X' ? player1Name : player2Name
+        } you have won well done mate :)`
+      );
+      handleCompleteReset();
+    } else if (newValues.every((value) => value !== '')) {
+      Alert.alert("It's a draw!");
+      handleCompleteReset();
+    } else {
+      setCurrentPlayer(currentPlayer == 'X' ? 'O' : 'X');
+    }
   }
 
   //
   let winningConditons = [
-    [1, 2, 3][(4, 5, 6)][(7, 8, 9)][(1, 4, 7)][(2, 5, 8)][(3, 6, 9)][(1, 5, 9)][
-      (3, 5, 7)
-    ],
+    [0, 1, 2], //first row
+    [3, 4, 5], //second row
+    [6, 7, 8], //third row
+    [0, 3, 6], //first colloumn
+    [1, 4, 7], // second coloumn
+    [2, 5, 8], //third column
+    [0, 4, 8], //diagonal
+    [2, 4, 6], //diagonal
   ];
+
+  function checkWin(boxValues) {
+    return winningConditons.some((condition) => {
+      return condition.every((index) => boxValues[index] === currentPlayer);
+    }); //I thank stack exchange for this very elegant soloution you are my hero and have saved me countless times
+  }
+
   function handleCompleteReset() {
     setBoxValues(['', '', '', '', '', '', '', '', '']);
-    setCurrentPlayer((currentPlayer = useState('X')));
+    setCurrentPlayer('X');
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -63,7 +87,7 @@ export default function App() {
             handlePress(0);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[0] || 'Box 1'}</Text>
+          <Text style={styles.boxText}>{boxValues[0] || ''}</Text>
         </Pressable>
         <Pressable
           key={1}
@@ -72,7 +96,7 @@ export default function App() {
             handlePress(1);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[1] || 'Box 2'}</Text>
+          <Text style={styles.boxText}>{boxValues[1] || ''}</Text>
         </Pressable>
         <Pressable
           key={2}
@@ -81,7 +105,7 @@ export default function App() {
             handlePress(2);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[2] || 'Box 3'}</Text>
+          <Text style={styles.boxText}>{boxValues[2] || ''}</Text>
         </Pressable>
         <Pressable
           key={3}
@@ -90,7 +114,7 @@ export default function App() {
             handlePress(3);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[3] || 'Box 4'}</Text>
+          <Text style={styles.boxText}>{boxValues[3] || ''}</Text>
         </Pressable>
         <Pressable
           key={4}
@@ -99,7 +123,7 @@ export default function App() {
             handlePress(4);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[4] || 'Box 5'}</Text>
+          <Text style={styles.boxText}>{boxValues[4] || ''}</Text>
         </Pressable>
         <Pressable
           key={5}
@@ -108,7 +132,7 @@ export default function App() {
             handlePress(5);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[5] || 'Box 6'}</Text>
+          <Text style={styles.boxText}>{boxValues[5] || ''}</Text>
         </Pressable>
         <Pressable
           key={6}
@@ -117,7 +141,7 @@ export default function App() {
             handlePress(6);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[6] || 'Box 7'}</Text>
+          <Text style={styles.boxText}>{boxValues[6] || ''}</Text>
         </Pressable>
         <Pressable
           key={7}
@@ -126,7 +150,7 @@ export default function App() {
             handlePress(7);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[7] || 'Box 8'}</Text>
+          <Text style={styles.boxText}>{boxValues[7] || ''}</Text>
         </Pressable>
         <Pressable
           key={8}
@@ -135,15 +159,34 @@ export default function App() {
             handlePress(8);
           }}
         >
-          <Text style={styles.boxText}>{boxValues[8] || 'Box 9'}</Text>
+          <Text style={styles.boxText}>{boxValues[8] || ''}</Text>
         </Pressable>
-        <Pressable
-          onPress={function () {
-            handleCompleteReset();
-          }}
-        >
-          <Text style={styles.boxText}>Reset</Text>
-        </Pressable>
+        <View style={styles.resetContainer}>
+          <Pressable style={styles.resetButton} onPress={handleCompleteReset}>
+            <Text style={styles.boxText}>Reset</Text>
+          </Pressable>
+        </View>
+        <View style={styles.playerContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder='Player 1 Name'
+            placeholderTextColor='#FFF'
+            onChangeText={setPlayer1Name}
+            value={player1Name}
+          />
+          <Text style={styles.scoreText}> {player1Score}</Text>
+        </View>
+        <View style={styles.playerContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder='Player 2 Name'
+            placeholderTextColor='#FFF'
+            onChangeText={setPlayer2Name}
+            value={player2Name}
+          />
+          <Text style={styles.scoreText}> {player2Score}</Text>
+        </View>
+
         <StatusBar style='auto' />
       </View>
     </SafeAreaView>
@@ -151,6 +194,31 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  resetContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    width: '100%',
+  },
+  nameContainer: {
+    marginBottom: 20,
+    width: '40%',
+  },
+  input: {
+    height: 40,
+    borderColor: '#FFF',
+    borderWidth: 1,
+    marginBottom: 10,
+    color: '#FFF',
+    paddingHorizontal: 10,
+  },
+  scoreContainer: {
+    marginBottom: 20,
+  },
+  scoreText: {
+    color: '#FFF',
+    fontSize: 24,
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#000',
@@ -161,16 +229,18 @@ const styles = StyleSheet.create({
   },
   box: {
     width: '33.33%',
-    height: '33.33%',
+    height: 200,
     backgroundColor: '#000',
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#FFF',
   },
   boxText: {
     color: '#FFF',
-    fontSize: 18,
-    textAlign: 'center', // Center the text
+    fontSize: 50,
+    textAlign: 'center',
+    lineHeight: 50,
   },
 });
 
