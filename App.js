@@ -40,13 +40,14 @@ export default function App() {
       } else {
         setPlayer2Score(player2Score + 1);
       }
-
-      Alert.alert(
-        `${
-          currentPlayer === 'X' ? player1Name : player2Name
-        } you have won well done mate :)`
-      );
-      handleCompleteReset();
+      setTimeout(() => {
+        Alert.alert(
+          `${
+            currentPlayer === 'X' ? player1Name : player2Name
+          } you have won well done mate :)`
+        );
+        handleCompleteReset();
+      }, 250);
     } else if (newValues.every((value) => value !== '')) {
       Alert.alert("It's a draw!");
       handleCompleteReset();
